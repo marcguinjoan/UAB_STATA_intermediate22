@@ -18,7 +18,7 @@
 - Regression tables (estout) and edition
 - Graphs and predicted values */
 
-***Today we will work with individual-level data coming from the CEO, the Catalan polling institute. You will find the questionnaire in Catalan, Spanish and (Google translated) in English. We will get into inferential statistics. According to this, we will use data from a sample of Catalan individuals interviewed in June 2021 to make generalizations about a population (Catalans). The class requires some basic knowledge on inferential statistics that we will unfortunatelly not be able to cover it. To begin with, we will perform some basic recodes of the variables that we will use during this fourth class. 
+***Today we will work with individual-level data coming from the CEO, the Catalan polling institute. In the databases folder you will find the questionnaire in Catalan, Spanish and (Google translated) in English. We will get into inferential statistics. According to this, we will use data from a sample of Catalan individuals interviewed in June 2021 to make generalizations about a population (Catalans). The class requires some basic knowledge on inferential statistics that we will unfortunatelly not be able to cover it. To begin with, we will perform some basic recodes of the variables that we will use during the class. 
 
 import spss using "http://upceo.ceo.gencat.cat/wsceop/7988/Microdades_anonimitzades_996.sav", clear
 
@@ -67,7 +67,10 @@ reg satisfaction ideology
 reg satisfaction ideology age // Continuous variables
 
 reg satisfaction ideology age female  // Female is a dichotomous variable and, as such, STATA will treat the value 0 (men) as the reference category and will provide a coefficient for 1 (women)
-*What happens when we have a variable that, despite having more than 2 categories, has to be treated as categorical? We use "i." in front of the variable
+*What happens when we have a variable that, despite having more than 2 categories, has to be treated as categorical? 
+
+fre born
+reg satisfaction ideology age female born  // Despite having different categories, STATA by default treats it as continuous. We neeed to tell STATA that it is categorical. For doing so, we will use the "i." in front of the variable
 
 reg satisfaction ideology age i.female i.born  // It is a good advice to mark always all categorical variables with the "i."
 
@@ -125,10 +128,10 @@ margins, at(female=(0 1))
 marginsplot  // First attempt
 marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted satisfaction with democracy", height(5))  // Improved
 
-*Now with the territorial prefernce variable
+*Now with the territorial preference variable
 reg satisfaction ideology age i.female i.born i.territorial
 margins, at(territorial=(1 2 3))
-marginsplot  
+marginsplot
 marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted satisfaction with democracy", height(5)) xlabel(1 `""Region or" "Autonomous Com.""' 2 `""Federal" "State""' 3 `""Independent" "State""') xtitle("Territorial preferences Catalonia vs Spain", height(5)) scale(0.9)  // Not bad but the xlabels cannot be seen. We need to work around this
 
 marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted satisfaction with democracy", height(5)) xlabel(1 `""        Region or" "        Autonomous Com.""' 2 `""Federal" "State""' 3 `""Independent        " "State        ""') xtitle("Territorial preferences Catalonia vs Spain", height(5)) scale(0.9) // Now we can read them! :)
