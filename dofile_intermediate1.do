@@ -77,8 +77,8 @@ reg satisfaction ideology age i.female i.born  // It is a good advice to mark al
 reg satisfaction ideology age i.female i.born i.territorial
 
 *But why do we assume that ideology is a continuos variable and hence its is linearily related to satisfaction with democracy?
-*Another option is to divide ideology between leftist, centrist and rightist indivdiudsls:
-recode ideology (1/3=1 "Left") (4=2 "Centre") (5/7=3 "Right"), gen(ideol3)  /// And now we can replicate the same model with ideology as a  categorical variable:
+*Another option is to divide ideology between leftist, centrist and rightist individuals:
+recode ideology (1/3=1 "Left") (4=2 "Centre") (5/7=3 "Right"), gen(ideol3)  // And now we can replicate the same model with ideology as a  categorical variable:
 
 reg satisfaction i.ideol3 age i.female i.born i.territorial  // Despite evidence is not statistically significan we can see that the relationship was ideed no linear. 
 
@@ -104,7 +104,7 @@ esttab m1 m2 m3 m4 using "results/table1.html", b(3) se(3) r2 title(Table 1. OLS
 
 esttab m1 m2 m3 m4 using "results/table1.html", b(3) se(3) r2 title(Table 1. OLS model on satisfaction with democracy) starlevels(+ 0.1 * 0.05 ** 0.01 *** 0.001) label replace  // Labels instead of variable name
 
-esttab m1 m2 m3 m4 using "results/table1.html", b(3) se(3) r2 title(Table 1. OLS model on satisfaction with democracy) starlevels(+ 0.1 * 0.05 ** 0.01 *** 0.001) label  mtitles ("M1" "M2" "M3" "M4" "M5") nonumbers  replace  // Remove numbers in first raw and edit names
+esttab m1 m2 m3 m4 using "results/table1.html", b(3) se(3) r2 title(Table 1. OLS model on satisfaction with democracy) starlevels(+ 0.1 * 0.05 ** 0.01 *** 0.001) label  mtitles ("M1" "M2" "M3" "M4") nonumbers  replace  // Remove numbers in first raw and edit names
 
 esttab m1 m2 m3 m4 using "results/table1.html", b(3) se(3) r2 title(Table 1. OLS model on satisfaction with democracy) starlevels(+ 0.1 * 0.05 ** 0.01 *** 0.001) label  mtitles ("M1" "M2" "M3" "M4" "M5") nonumbers nogaps replace  // Remove gaps between variables
 
@@ -130,11 +130,11 @@ marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted s
 
 *Now with the territorial preference variable
 reg satisfaction ideology age i.female i.born i.territorial
-margins, at(territorial=(1 2 3))
+margins, at(territorial=(1 2 3))    // margins, at(territorial=(1(1)3))
 marginsplot
 marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted satisfaction with democracy", height(5)) xlabel(1 `""Region or" "Autonomous Com.""' 2 `""Federal" "State""' 3 `""Independent" "State""') xtitle("Territorial preferences Catalonia vs Spain", height(5)) scale(0.9)  // Not bad but the xlabels cannot be seen. We need to work around this
 
-marginsplot, title("Satisfaction with democracy, by gender") ytitle("Predicted satisfaction with democracy", height(5)) xlabel(1 `""        Region or" "        Autonomous Com.""' 2 `""Federal" "State""' 3 `""Independent        " "State        ""') xtitle("Territorial preferences Catalonia vs Spain", height(5)) scale(0.9) // Now we can read them! :)
+marginsplot, title("Satisfaction with democracy, by territorial preference") ytitle("Predicted satisfaction with democracy", height(5)) xlabel(1 `""        Region or" "        Autonomous Com.""' 2 `""Federal" "State""' 3 `""Independent        " "State        ""') xtitle("Territorial preferences Catalonia vs Spain", height(5)) scale(0.9) // Now we can read them! :)
 
 
 ************************************ PRACTICE ***********************************
