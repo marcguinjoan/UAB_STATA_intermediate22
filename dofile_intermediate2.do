@@ -97,6 +97,36 @@ egen sd_nondemocracy = rowsd(Q235 Q236 Q237 Q238 Q239)
 *or the median...
 egen median_nondemocracy = rowmedian(Q235 Q236 Q237 Q238 Q239)
 
+*In some occasions we do not want to take a row value (i.e. an individual's), but rather the column one, by a selected variable. For instance, we may want to take the mean (but also any other arithmetic measure) importance for democracy by, say, municipality. For doign so we will use the variable Q250. We have to recode it before.
+recode Q250 (-2 -1=0), gen(impdemocracy)
+fer impdemocracy
+
+*The municipality variable is N_TOWN
+egen mean_impdemocracy = mean(impdemocracy), by(N_TOWN)
+browse
+
+list N_TOWN impdemocracy mean_impdemocracy in 1/100
+
+*how do plot this?
+hist mean_impdemocracy // this is sensitive to the number of observation (surveys) each municipality has
+
+*how can we solve this. Well, just by sorting and counting the observations BY EACH MUNICIPALITY
+bysort N_TOWN: gen count = _n
+list N_TOWN impdemocracy mean_impdemocracy count in 1/100
+
+hist mean_impdemocracy if count==1
+
+*what if we want just to include those municiplaities that have more than 5 people interviewed
+bysort N_TOWN: gen totalcount=_N
+list N_TOWN impdemocracy mean_impdemocracy count totalcount in 1/100
+
+hist mean_impdemocracy if count==1 & totalcount>4
+
+*what if we want to plot the importance for democracy just for one municipality?
+*let's identify Kyiv
+fre N_TOWN, all   // value 804067
+hist impdemocracy if N_TOWN==804067, xtitle(Importance of democracy) title(Importance of democracy in Kyiv)
+
 
 ***4. Transformation of variables
 *Sometimes variables are related to another variable in a non-linear way. For instance, we have seen that the membership variable was extremely skewed to the left. Why? well, there is an individal restriction in the number of organisations in which someone can participate. If this is true, changing from 0 to 1 membership would be a *more substantive* change than changing from 9 to 10. In other words, a change from 0 to 1 is bigger than a marginal change from 9 top 10. Indeed, in the first case we are changing from some who does *not* participate at all, to someone who *does* participate. In the later, we are just changing from someone who participates *a lot* to some that participated *even more*.
@@ -111,7 +141,7 @@ fre Q209
 alpha Q209 Q210 Q211 Q212 Q213 Q214 Q215 Q216 Q217 Q218 Q219 Q220   Q96 Q97 Q98 Q99 Q100 Q101 Q102 Q103 Q104 Q105, gen(participation)
 hist participation, name(histpart, replace)
 
-gen log_participation = log(participation)  // 824 mising values?
+gen log_participation = log(participation)  // 662 mising values?
 hist log_participation // negative values?
 
 *Log(0)=. & log(0-1)=negative values --> log(1+participation)
@@ -155,15 +185,19 @@ recode Q240 (-2 -1=.), gen(ideol)  // ideology. There are a lot of missing value
 recode Q249 (-2 -1=3 "Not ideologically placed") (1/4=0 "Left") (5=1 "Centre") (6/10=2 "Right"), gen(ideol3)
 
 rename Q262 age
-recode Q260 (2=1 "Femane") (1=0 "Men"), gen(female)
+recode Q260 (2=1 "Female") (1=0 "Men"), gen(female)
 recode H_URBRURAL (1=1 "Urban") (2=0 "Rural"), gen(urban)
 recode Q272 (-1 9000=.) (3630=0 "Russian") (4410=1 "Ukranian"), gen(ukranian)
 
 **And the model...
 logit vote i.ideol3 age i.female i.urban i.ukranian
 
+*To change the reference category we can use the "ib`num category'.varname" option:
+logit vote ib1.ideol3 age i.female i.urban i.ukranian // now the reference category are center individuals
+logit vote ib2.ideol3 age i.female i.urban i.ukranian // and now right-wing individuals
 
-***5. Predicted vales
+
+***5. Predicted values
 *The procedure is exactly the same than with the linear regression...
 quiet logit vote i.ideol3 age i.female i.urban i.ukranian  // if we do not want the output to be displayed we can use the quiet option
 
