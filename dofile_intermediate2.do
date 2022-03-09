@@ -29,7 +29,7 @@ use "databases\WVS_Wave_7_Ukraine_Stata_v2.0.dta", clear
 *We have the following variables:
 describe Q96 Q97 Q98 Q99 Q100 Q101 Q102 Q103 Q104 Q105
 
-*In the survey we identify 10 different ways to be member of a political or social organisation. We now want to create a new variable that it is an *aggregation* of the different ways an individual can be member of an organisation. First, we need to recode all variables to that membership==1 and not membership==0.
+*In the survey we identify 10 different ways to be member of a political or social organisation. We now want to create a new variable that is an *aggregation* of the different ways an individual can be member of an organisation. First, we need to recode all variables so that membership==1 and no membership==0.
 
 fre Q96  // 0: do not belong; 1: inactive; 2: active
 
@@ -44,7 +44,7 @@ fre Q96 // Good! we have now all variables properly recoded.
 *We now just need to create a new variable which is the sum of the different values. There are several ways to do this: 
 
 *1. By creating a new variable and summing the values
-gen membership = (Q96 + Q97 + Q98 + Q99 + Q100 + Q101 + Q102 + Q103 + Q104 + Q105)/10  // We divide it by 10 to range from 0 to 1. 
+gen membership = (Q96 + Q97 + Q98 + Q99 + Q100 + Q101 + Q102 + Q103 + Q104 + Q105)/10  // We divide it by 10 to range from 0 to 1. We could just not do it and it would potentially range from 0 to 10 instead. 
 
 hist membership
 
@@ -59,7 +59,7 @@ cor membership membership2 membership3 // the three variables are identical!
 
 drop membership2 membership3
 
-*Why indexes? while it is true that we are loosing some information (in this case, membership in which type of association), we are obtaing other information (how many asociations does the individual belongs to). In fact, we can only now in which associatons does (or does not) the individual belongs when he/she does not belong to any association (value 0) or, else, if he/she belongs to all of them (value 1). 
+*Why indexes? while it is true that we are loosing some information (in this case, membership in which type of association), we are obtaing other information (how many asociations does the individual belongs to). In fact, we can only now in which association(s) does (or does not) the individual belongs to when he/she does not belong to any association (value 0) or, else, if he/she belongs to all of them (value 1). 
 *Again in this case the variable may well range from 0 to 1 or just be the count of associations--in this case it would  range from 0 to 10. This is a personal decision with no further empirical consequences. 
 
 
@@ -69,9 +69,11 @@ drop membership2 membership3
 describe Q235 Q236 Q237 Q238 Q239 // All these variables are supporttive of non-democratic forms of government, except for Q238. Let's create a measure of non-democracy. 
 
 *First, we recode all variables except for Q238
+fre Q235
 recode Q235 Q236 Q237 Q239 (-2 -1=.) (1=1) (2=0.66) (3=0.33) (4=0)
 
 *and now we recode Q238
+fre Q238
 recode Q238 (-2 -1=.) (1=0) (2=0.33) (3=0.66) (4=1)
 
 *finally we create a new variable:
@@ -97,7 +99,7 @@ egen median_nondemocracy = rowmedian(Q235 Q236 Q237 Q238 Q239)
 
 
 ***4. Transformation of variables
-*Sometimes variables are related to another variable in a non-linear way. For instance, we have seen that the membership variable was extremely skewed to the left. Why? well, there is an individal restriction in the number of organisations in which someone can participate. If this is true, changing from 0 to 1 membership would be a *more substantive* change than changing from 9 to 10. A change from 0 to 1 is bigger than a marginal change from 9 top 10. Indeed, in the first case we are changing from some who does *not* participate to some who *does* participate. In the later, we are just changing from someone who participates *a lot* to some that participated *even more*.
+*Sometimes variables are related to another variable in a non-linear way. For instance, we have seen that the membership variable was extremely skewed to the left. Why? well, there is an individal restriction in the number of organisations in which someone can participate. If this is true, changing from 0 to 1 membership would be a *more substantive* change than changing from 9 to 10. In other words, a change from 0 to 1 is bigger than a marginal change from 9 top 10. Indeed, in the first case we are changing from some who does *not* participate at all, to someone who *does* participate. In the later, we are just changing from someone who participates *a lot* to some that participated *even more*.
 *Hence, if we assume that changes in this variable are not monotonically increasing, we can transformate the variable so that changes in higher values are given less importane. How? with a "logarithmic" tranformation.
 
 *Let's do it with the variables identifying political/social and online participation (Q209 Q210 Q211 Q212 Q213 Q214 Q215 Q216 Q217 Q218 Q219 Q220), as well as all the previous variables of membership: 
