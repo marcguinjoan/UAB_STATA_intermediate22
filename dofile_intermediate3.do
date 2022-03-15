@@ -76,17 +76,20 @@ bysort russia: fre Q246 // it is curious that in Russia the variable ranges from
 recode Q246 (-2 -1=.) (0=1), gen(democracy)  
 
 *The OLS regression model
-reg democracy i.ideol3 age i.female i.urban i.nat_language
+reg democracy i.ideol3 age i.female i.urban i.nat_language i.russia
 
+capture ssc install coefplot
 coefplot
 
 coefplot, title(Civil rights protection) xline(0) drop(_cons) sch(s1mono) scale(0.9)  // drop constant
 
 coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel // Includes the reference category
 
-coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  coeflabels(0.ideol3 ="Ideology: Left" 0.female= "Gender: Male" 0.urban="Type of settlement: Rural" 0.nat_language = "Language: Another") // Includes a title for each variable
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  coeflabels(0.ideol3 ="Ideology: Left" 0.female= "Gender: Male" 0.urban="Type of settlement: Rural" 0.nat_language = "Language: Another" 0.russia ="Country: Ukraine") // Includes a title for each variable
 
-coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age="In years") // Includes a title for each variable
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="Ideology" age="Age" 0.female= "Gender" 0.urban="Type of settlement" 0.nat_language = "Language" 0.russia ="Country") coeflabels(age="In years") // Includes a title for each variable
+
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}" 0.russia ="{bf:Country}") coeflabels(age="In years") // Includes a title for each variable
 
 *and if we want the variable age to range from 0 to 1....
 sum age
@@ -94,21 +97,22 @@ gen age1 = (age-18)/73
 sum age1
 gen age_sq = (1+age1)^2
 
-reg democracy i.ideol3 age1 i.female i.urban i.nat_language
-coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1")  // Includes a title for each variable
+reg democracy i.ideol3 age1 i.female i.urban i.nat_language i.russia
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}" 0.russia ="{bf:Country}") coeflabels(age1="From 0 to 1")  // Includes a title for each variable
 
-coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1") level(95 90) fxsize(90) note("Whiskers indicate 90 and 95% CI", pos(7) size(small))  // 90 and 95% CI
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}" 0.russia ="{bf:Country}") coeflabels(age1="From 0 to 1") level(95 90) note("Whiskers indicate 90 and 95% CI", pos(7) size(small))  // 90 and 95% CI
 
 
 ***3. Coefplot in two regression models
+capture ssc install estout
 eststo Ukraine: reg democracy i.ideol3 age1 i.female i.urban i.nat_language if russia==0
 eststo Russia: reg democracy i.ideol3 age1 i.female i.urban i.nat_language if russia==1
 
-coefplot Ukraine Russia, title(Civil rights protection) xline(0, lc(red)) drop(_cons) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1")  graphregion(fcolor(white)) level(95 90) fxsize(90) note("Whiskers indicate 90 and 95% CI", pos(7) size(small)) sch(s1mono)  // By country
+coefplot Ukraine Russia, title(Civil rights protection) xline(0, lc(red)) drop(_cons) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1")  level(95 90) graphregion(fcolor(white)) note("Whiskers indicate 90 and 95% CI", pos(7) size(small)) sch(s1mono)  // By country
 
 
 ***4. Coefplot in two parallel figures
-coefplot Ukraine || Russia, xline(0, lc(red)) drop(_cons) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1")  graphregion(fcolor(white)) level(95 90) fxsize(90) sch(s1mono)  // By country
+coefplot Ukraine || Russia, xline(0, lc(red)) drop(_cons) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="From 0 to 1")  graphregion(fcolor(white)) level(95 90) sch(s1mono)  // By country
 
 
 ***5. Interaction models: Sometimes the effect of two different independent variables on a dependent variable is not additive, but rather this is conditional. What does this mean? 
@@ -116,7 +120,7 @@ coefplot Ukraine || Russia, xline(0, lc(red)) drop(_cons) scale(0.9) baselevel  
 
 *To put it simply. When do we use interation models? When we assume that the slope of one category will be different from the slope of the other, or when we assume that only through the *concurrence* of two factors a phenomenon will occur. 
 
-*Let's work again only on the Ukranian sample. Now the dependent variable will be ideology (self-placement in the left-righ axis). A constitutive model tells us that, as individuals become older, the are less rightist; the model also tells us that those who have ukranian as their language, are also to the right of those who have Russian as their language: 
+*Let's work again only with the Ukranian sample. Now the dependent variable will be ideology (self-placement in the left-righ axis). A constitutive model tells us that, as individuals become older, they are less rightist; the model also tells us that those who have Ukranian as their language, are also to the right of those who have Russian as their language: 
 reg ideol c.age i.nat_language urban i.female if russia==0
 margins, at(age=(18(1)80))
 marginsplot, title(Age) sch(s1mono) name(age, replace)
@@ -139,7 +143,7 @@ reg ideol c.age##i.nat_language urban i.female if russia==0
 */
 
 *In a model it will be easier to understand: 
-margins, at(age=(25 65) nat_language=(0 1))
+margins, at(age=(25 85) nat_language=(0 1))
 marginsplot, title("Ideology in Ukraine, by age and language") sch(s1mono) name(age_lang, replace) legend(order(3 "Russian" 4 "Ukranian"))
 
 *Finally, we can plot what is called the "marginal effects", this is, the marginal change at every category of age between Russian and Ukranian speakers.
@@ -161,7 +165,7 @@ marginsplot, title(Age and support for Civil rights protection) ytitle(Civil rig
 
 *similarly we can replicate the coefplot with the age square term...
 reg democracy i.ideol3 c.age1##c.age1 i.female i.urban i.nat_language 
-coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="Age, in years" c.age1#c.age1="Age squared")  // Note that here I have also changed the coeflabels in "age1"
+coefplot, title(Civil rights protection) xline(0, lc(red)) drop(_cons) sch(s1mono) scale(0.9) baselevel  headings(0.ideol3 ="{bf:Ideology}" age1="{bf:Age}" 0.female= "{bf:Gender}" 0.urban="{bf:Type of settlement}" 0.nat_language = "{bf:Language}") coeflabels(age1="Age, from 0 to 1" c.age1#c.age1="Age squared")  // Note that here I have also changed the coeflabels in "age1"
 
  
 ************************************ PRACTICE ***********************************
